@@ -25,7 +25,14 @@ func main() {
 	}
 
 	defer conn.Close()
-
-	conn.Write([]byte("+PONG\r\n"))
+	for {
+		var buff = make([]byte, 1024)
+		_, err := conn.Read(buff)
+		if err != nil {
+			fmt.Println("Error reading from client")
+			continue
+		}
+		conn.Write([]byte("+PONG\r\n"))
+	}
 
 }

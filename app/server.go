@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strings"
+
 	// Uncomment this block to pass the first stage
 	// "net"
 	// "os"
@@ -24,10 +26,25 @@ func main() {
 			fmt.Println("Error accepting connection: ", err.Error())
 			os.Exit(1)
 		}
-		go handlePing(conn)
+		go handleEcho(conn)
+		//go handlePing(conn)
 	}
 }
 
+func handleEcho(conn net.Conn) {
+	for {
+		defer conn.Close()
+		var msg = make([]byte, 1024)
+		if _, err := conn.Read(msg); err != nil {
+			fmt.Println("Error reading from client")
+			continue
+		}
+		strMsg := string(msg)
+		idx := strings.Index(strMsg, "o")
+
+		conn.Write([]byte(strMsg[idx+2:]))
+	}
+}
 func handlePing(conn net.Conn) {
 	for {
 		defer conn.Close()

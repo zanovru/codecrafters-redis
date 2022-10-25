@@ -18,21 +18,23 @@ func main() {
 		fmt.Println("Failed to bind to port 6379")
 		os.Exit(1)
 	}
-	conn, err := l.Accept()
-	if err != nil {
-		fmt.Println("Error accepting connection: ", err.Error())
-		os.Exit(1)
-	}
-
-	defer conn.Close()
 	for {
-		var buff = make([]byte, 1024)
-		_, err := conn.Read(buff)
+		conn, err := l.Accept()
 		if err != nil {
+			fmt.Println("Error accepting connection: ", err.Error())
+			os.Exit(1)
+		}
+		go handlePing(conn)
+	}
+}
+
+func handlePing(conn net.Conn) {
+	for {
+		defer conn.Close()
+		if _, err := conn.Read([]byte{}); err != nil {
 			fmt.Println("Error reading from client")
 			continue
 		}
 		conn.Write([]byte("+PONG\r\n"))
 	}
-
 }

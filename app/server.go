@@ -5,7 +5,6 @@ import (
 	"net"
 	"os"
 	"strings"
-
 	// Uncomment this block to pass the first stage
 	// "net"
 	// "os"
@@ -27,7 +26,7 @@ func main() {
 			os.Exit(1)
 		}
 		go handleEcho(conn)
-		//go handlePing(conn)
+		go handlePing(conn)
 	}
 }
 

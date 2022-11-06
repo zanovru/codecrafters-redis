@@ -32,10 +32,12 @@ func handleConnection(conn net.Conn) {
 		if err != nil {
 			fmt.Println("Error reading from connection: ", err.Error())
 		}
-		response, err := Handle(message[:n-1])
+		response, err := Handle(message[:n])
 		if err != nil {
 			fmt.Println("Error handling the message:", err.Error())
 		}
+
 		conn.Write([]byte(response))
+
 	}
 }

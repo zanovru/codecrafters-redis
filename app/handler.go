@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 func Handle(command []byte) (string, error) {
@@ -27,7 +28,7 @@ func handleCommand(cmd Result, args []Result) (string, error) {
 	case "ping":
 		return handlePing()
 	case "echo":
-		return "", nil
+		return handleEcho(args)
 	default:
 		fmt.Println(cmd.Value)
 		return "", errors.New("unrecognized command: ")
@@ -39,5 +40,21 @@ func handlePing() (string, error) {
 	return Encode(Result{
 		Type:  RedisSimpleString,
 		Value: "PONG",
+	})
+}
+
+func handleEcho(args []Result) (string, error) {
+	var stringSlice []string
+	for _, result := range args {
+		value, ok := result.Value.(string)
+		if !ok {
+			return "", errors.New("failed to convert value to string")
+		}
+		stringSlice = append(stringSlice, value)
+	}
+
+	return Encode(Result{
+		Type:  RedisBulkString,
+		Value: strings.Join(stringSlice, " "),
 	})
 }

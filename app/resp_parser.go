@@ -169,5 +169,5 @@ func decode(value []byte) (Result, int) {
 
 func matchCRLF(value []byte) (pos, end int) {
 	i := bytes.Index(value, []byte("\r\n"))
-	return i, i + 2
+	return i, i + len("\r\n")
 }

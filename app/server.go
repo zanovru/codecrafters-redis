@@ -38,6 +38,5 @@ func handleConnection(conn net.Conn) {
 		}
 
 		conn.Write([]byte(response))
-
 	}
 }

@@ -6,13 +6,27 @@ import (
 	"os"
 )
 
-func main() {
+type Server struct {
+	handler *Handler
+	storage *Storage
+}
+
+func NewServer(handler *Handler, storage *Storage) *Server {
+	return &Server{
+		handler: handler,
+		storage: storage,
+	}
+}
+func ListenAndServe() {
 	l, err := net.Listen("tcp", "0.0.0.0:6379")
 	if err != nil {
 		fmt.Println("Failed to bind to port 6379")
 		os.Exit(1)
 	}
 
+	storage := NewStorage()
+	handler := NewHandler(storage)
+	server := NewServer(handler, storage)
 	for {
 		conn, err := l.Accept()
 		if err != nil {
@@ -20,11 +34,11 @@ func main() {
 			os.Exit(1)
 		}
 
-		go handleConnection(conn)
+		go server.handleConnection(conn)
 	}
 }
 
-func handleConnection(conn net.Conn) {
+func (s *Server) handleConnection(conn net.Conn) {
 	defer conn.Close()
 	message := make([]byte, 1024)
 	for {
@@ -32,7 +46,7 @@ func handleConnection(conn net.Conn) {
 		if err != nil {
 			fmt.Println("Error reading from connection: ", err.Error())
 		}
-		response, err := Handle(message[:n])
+		response, err := s.handler.Handle(message[:n])
 		if err != nil {
 			fmt.Println("Error handling the message:", err.Error())
 		}

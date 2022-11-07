@@ -15,14 +15,13 @@ func NewStorage() *Storage {
 
 func (s *Storage) Get(key string) (string, bool) {
 	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	value, ok := s.data[key]
-	s.mu.RUnlock()
 	if !ok {
 		return "", false
-	} else {
-		return value, true
 	}
-
+	return value, true
 }
 
 func (s *Storage) Set(key, value string) {

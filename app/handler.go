@@ -3,7 +3,9 @@ package main
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
+	"time"
 )
 
 type Handler struct {
@@ -94,22 +96,53 @@ func (h *Handler) handleGet(args []Result) (string, error) {
 }
 
 func (h *Handler) handleSet(args []Result) (string, error) {
-	if len(args) > 2 {
+	if len(args) > 4 || len(args) < 2 || len(args) == 3 {
 		return "", errors.New("invalid amount of arguments")
 	}
-	key, ok := args[0].Value.(string)
-	if !ok {
-		return "", errors.New("failed to convert key to string")
+	options, err := extractOptions(args)
+	if err != nil {
+		return "", err
 	}
-	value, ok := args[0].Value.(string)
-	if !ok {
-		return "", errors.New("failed to convert value to string")
+	if len(args) == 2 {
+		h.storage.Set(options[0], options[1])
+	} else {
+		ms, err := strconv.Atoi(options[3])
+		if err != nil {
+			return "", err
+		}
+		h.storage.SetWithExpiration(options[0], options[1], time.Millisecond*time.Duration(ms))
 	}
-
-	h.storage.Set(key, value)
 
 	return Encode(Result{
 		Type:  RedisSimpleString,
 		Value: "OK",
 	})
+}
+
+func extractOptions(args []Result) ([]string, error) {
+	var options []string
+	key, ok := args[0].Value.(string)
+	if !ok {
+		return nil, errors.New("failed to convert key to string")
+	}
+	value, ok := args[1].Value.(string)
+	if !ok {
+		return nil, errors.New("failed to convert value to string")
+	}
+	options = append(options, key, value)
+	if len(args) > 2 {
+		px, ok := args[2].Value.(string)
+		if !ok {
+			return nil, errors.New("failed to convert key to string")
+		}
+		if strings.ToLower(px) != "px" {
+			return nil, errors.New("expected px to be the option")
+		}
+		duration, ok := args[3].Value.(string)
+		if !ok {
+			return nil, errors.New("failed to convert value to string")
+		}
+		options = append(options, px, duration)
+	}
+	return options, nil
 }

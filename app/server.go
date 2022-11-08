@@ -17,8 +17,8 @@ func NewServer(handler *Handler, storage *Storage) *Server {
 		storage: storage,
 	}
 }
-func ListenAndServe() {
-	l, err := net.Listen("tcp", "0.0.0.0:6379")
+func ListenAndServe(address string) {
+	l, err := net.Listen("tcp", address)
 	if err != nil {
 		fmt.Println("Failed to bind to port 6379")
 		os.Exit(1)

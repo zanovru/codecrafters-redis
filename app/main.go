@@ -1,5 +1,9 @@
 package main
 
+import "fmt"
+
 func main() {
-	ListenAndServe()
+	port := ":6379"
+	fmt.Printf("Redis sever is running on %s port", port)
+	ListenAndServe(port)
 }

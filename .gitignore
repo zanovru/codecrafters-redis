@@ -1,1 +1,3 @@
 .idea/
+codecrafters.yml
+spawn_redis_server.sh

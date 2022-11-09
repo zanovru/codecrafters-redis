@@ -110,7 +110,9 @@ func decodeBulkString(value []byte) (Result, int) {
 }
 
 func decodeArray(value []byte) (Result, int) {
+	fmt.Println("value :", string(value))
 	i, end := matchCRLF(value)
+	fmt.Println(i, end)
 	size, err := strconv.Atoi(string(value[1:i]))
 	if err != nil {
 		return Result{

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 )
 
@@ -110,7 +111,9 @@ func decodeBulkString(value []byte) (Result, int) {
 }
 
 func decodeArray(value []byte) (Result, int) {
-	fmt.Println("value :", string(value))
+	if len(value) == 0 {
+		os.Exit(1)
+	}
 	i, end := matchCRLF(value)
 	fmt.Println(i, end)
 	size, err := strconv.Atoi(string(value[1:i]))

@@ -45,6 +45,7 @@ func (s *Server) handleConnection(conn net.Conn) {
 		n, err := conn.Read(message)
 		if err != nil {
 			fmt.Println("Error reading from connection: ", err.Error())
+			return
 		}
 		response, err := s.handler.Handle(message[:n])
 		if err != nil {
